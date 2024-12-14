@@ -1,0 +1,27 @@
+services:
+  airflow-mlflow:
+    build: .
+    hostname: airflow-mlflow
+    ports:
+      - "8888:8888"  # Airflow webserver
+      - "5555:5555"  # MLflow server
+    environment:
+      - AIRFLOW_HOME=/app/airflow
+      - AIRFLOW__CORE__DAGS_FOLDER=/app/airflow/dags
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - MLFLOW_TRACKING_URI=http://airflow-mlflow:5555
+    volumes:
+      - ./dags:/app/airflow/dags
+      - ./logs:/app/airflow/logs
+      - ./plugins:/app/airflow/plugins
+      - ./mlruns:/app/mlruns  # MLflow tracking
+      - ./src:/app/src  # Source code
+      - ./data:/app/data  # Data directory
+      - ./models:/app/models  # Models directory
+      - ./metrics:/app/metrics  # Metrics directory
+    networks:
+      - mlops-network
+
+networks:
+  mlops-network:
+    driver: bridge
